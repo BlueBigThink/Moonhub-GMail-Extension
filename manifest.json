@@ -2,6 +2,7 @@
   "manifest_version": 2,
   "name": "Moonhub Inbox Extension",
   "version": "1.0",
+  "description": "Moonhub Inbox Extension",
   "permissions": [
     "https://mail.google.com/",
     "https://inbox.google.com/",
@@ -16,7 +17,9 @@
     }
   ],
   "web_accessible_resources": [
-    "icon.png"
+    "images/*"
   ],
-  "icons": {"128": "icon.png"}
+  "icons": {
+    "128": "images/icon.png"
+  }
 }

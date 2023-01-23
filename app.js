@@ -7,7 +7,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
      // a compose view has come into existence, do something with it!
     composeView.addButton({
       title: "Add Nifty",
-      iconUrl: chrome.extension.getURL('icon.png'),
+      iconUrl: chrome.extension.getURL('images/icon.png'),
       onClick: function(event) {
         const content = composeView.getHTMLContent();
         let newContent = getMailContent(content);
