@@ -14,7 +14,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         let mainButtonBody = '<div id="main-button-body"></div>';
         newContent += mainButtonBody;
         composeView.setBodyHTML(newContent);
-         
+
         const mainBtnBody = new Vue({
           el: '#main-button-body',
           template: `
@@ -24,17 +24,27 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                   <button 
                     :id="item.id" 
                     :style="[button, button_blue]" 
-                    @click="btnHandle"  
+                    @click="btnHandle"
+                    :value="item.label"
                   >
                     {{ item.label }}
                   </button>
                 </div>
               </template>
+              <div id="text-body" :style="row">
+                <template v-for="txt in label">
+                  <div>
+                    <span>{{txt}}</span>
+                  </div>
+                </template>
+              </div>
             </div>
           `,
           methods:{
             btnHandle(event) {
-              // let id = parseInt(event.target.id);
+              let id = parseInt(event.target.id);
+              this.label.push(event.target.value);              
+              this.buttons = removeAt(this.buttons, id);
               // let query = '';
               // switch(id) {
               //   case 1:
@@ -48,14 +58,14 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               //     break;
               // }
               // axios.get(`http://127.0.0.1:5000/api/${query}`)
-              axios.get(`http://127.0.0.1:5000/api`)
-              .then(res => {
-                if (res.status === 200) {
-                  mail_content = res.data.text;
-                  mail_content = makeMailContent(mail_content);
-                  composeView.setBodyHTML(mail_content);
-                }
-              });
+              // axios.get(`http://127.0.0.1:5000/api`)
+              // .then(res => {
+              //   if (res.status === 200) {
+              //     mail_content = res.data.text;
+              //     mail_content = makeMailContent(mail_content);
+              //     composeView.setBodyHTML(mail_content);
+              //   }
+              // });
               //For Test
               // axios.get(`https://dog.ceo/api/breeds/image/random`)
               // .then(res => {
@@ -73,6 +83,8 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                 {id : 1, label : 'Send them my calendly'},
                 {id : 2, label : 'I have shared your resume with Together'},
                 {id : 3, label : 'I will share the resume and get back to you'}
+              ],
+              label : [
               ],
               row : {
                 'display' : 'block'
@@ -97,11 +109,15 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                 'color': 'black',
                 'border': '2px solid #000000',
                 'border-radius': '10px'
-              }
-              
+              }              
             }
           },
         });
+
+        function removeAt(arr, id) {
+          return arr.filter((obj) => obj.id !== id);
+        }
+
         function getMailContent(content, addition = "") {
           let parser = new DOMParser();
           let doc = parser.parseFromString(content, 'text/html');
@@ -118,6 +134,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           let new_content = '<div id="mail-content">' + content + '</div>';
           return new_content;
         }
+
         function makeMailContent(plainText){
           return '<div id="mail-content">' + plainText + '</div>';
         }
@@ -128,9 +145,10 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
       content = getMailContent(content);
       composeView.setBodyHTML(content);
 
-      function getMailContent(content, addition = "") {
+      function getMailContent(content) {
         let parser = new DOMParser();
         let doc = parser.parseFromString(content, 'text/html');
+        const text_body = doc.getElementById("text-body").innerHTML;
         try {
           doc.getElementById("button-body").remove();
         } catch (error) {
@@ -140,7 +158,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         if(mail != null){
           content = mail.innerHTML;
         }
-        if(addition != "") content += addition;
+        content += text_body;
         let new_content = '<div id="mail-content">' + content + '</div>';
         return new_content;
       }
@@ -149,8 +167,5 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
       const threadID = composeView.getThreadID();
       console.log("Sent ========>", threadID);
     });
-      
   });
 });
-
- 
