@@ -6,7 +6,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
    sdk.Compose.registerComposeViewHandler(function(composeView){
      // a compose view has come into existence, do something with it!
     composeView.addButton({
-      title: "Add Nifty",
+      title: "Moonhub",
       iconUrl: chrome.extension.getURL('images/icon.png'),
       onClick: function(event) {
         const content = composeView.getHTMLContent();
@@ -133,10 +133,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           if(addition != "") content += addition;
           let new_content = '<div id="mail-content">' + content + '</div>';
           return new_content;
-        }
-
-        function makeMailContent(plainText){
-          return '<div id="mail-content">' + plainText + '</div>';
         }
       },
     });
