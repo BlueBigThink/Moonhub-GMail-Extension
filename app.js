@@ -9,17 +9,16 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
       title: "Moonhub",
       iconUrl: chrome.extension.getURL('images/icon.png'),
       onClick: function(event) {
-        // const content = composeView.getHTMLContent();
-        // let newContent = getMailContent(content);
+        const content = composeView.getHTMLContent();
+        let userText = getUserText(content);
+        console.log(userText);
         let email_Body = '<div id="email-body"></div>';
-        // newContent += mainButtonBody;
-        // composeView.setBodyHTML(newContent);
         composeView.setBodyHTML(email_Body);
 
         const emailBody = new Vue({
           el: '#email-body',
           template: `
-            <div :style="fColorWhite">
+            <div id="mail-content" :style="fColorWhite">
               <div :style="[standard, header, fColorWhite, alignCenter]">
                 <img id="logoIcon" src="https://raw.githubusercontent.com/Blue-BigTech/Moonhub-Images/master/icon.png" :style="[logoIcon]"/>
                 <div :style="[headerTitle]">
@@ -41,38 +40,79 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                     </div>
                   </template>
                 </div>
+                <form>
+                  <div id="input-contact" :style="input_contact">
+                    <div :style="input_contact_child">
+                      <template>
+                        <label for="input-phone">Phone(Optional):</label>
+                        <input type="number" id="input-phone" name="input-phone" @change="inputPhoneHandle" :value="contact.phone">
+                      </template>
+                    </div>
+                  </div>
+                </form>
               </div>
               <div id="text-body" :style="[row, paper]">
-                <template v-for="txt in label">
-                  <div>
-                    <span>{{txt}}<br/>{{lorem.txt}}</span>
+                <template v-for="label in labels">
+                  <div :style="[fColorWhite]">
+                    <h3 :style="[margin0]">{{label.title}}</h3>
+                    <span>{{label.content}}</span>
+                  </div>
+                </template>
+                <template v-if="userTextVisible == true">
+                  <div :style="userTextStyle">
+                    <div id="user-title" :style="[fColorWhite]">
+                      <h3 :style="[margin0, noSendColor]">Additional Content(No Send) : &#x23CE;</h3>
+                    </div>
+                    <div id="user-text" :style="[margin0, fColorWhite]">&nbsp;</div>
                   </div>
                 </template>
               </div>
               <div id="footer" :style="[footer]">
-                <div :style="[fColorWhite, alignCenter]">
+                <div :style="[fColorWhite, alignCenter, fullWidth]">
+                  <template v-if="contact.phone != ''">
+                    <h3 :style="[margin0]">You can call me by phone : {{contact.phone}}</h3>
+                  </template>
                 </div>
               </div>
             </div>
           `,
           methods:{
+            inputPhoneHandle(event){
+              phonenumber = event.target.value;
+              let reg = /^-?\d*\.?\d*$/;
+              if(reg.test(phonenumber)){
+                this.contact.phone = phonenumber;
+              }
+            },
             btnHandle(event) {
               let id = parseInt(event.target.id);
-              this.label.push(event.target.value);              
+              let label = event.target.value;
+              this.labels.push(label);
               this.buttons = removeAt(this.buttons, id);
-              let subject = '';
+              let query = '';
               switch(id) {
                 case 1:
-                  subject = "Calendar";
+                  query = "calendar/";
                   break;
                 case 2:
-                  subject = "Share Resume";
+                  query = "resume/";
                   break;
                 case 3:
-                  subject = "Get back to you";
+                  query = "resumeback/";
                   break;
               }
-              composeView.setSubject(subject);
+              query += label;
+              const res = {
+                data : {
+                  subject : label,
+                  content : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc mattis sagittis hendrerit. Nulla faucibus ante at ex finibus vulputate."
+                }
+              }
+              this.labels.push({
+                title : label,
+                content : res.data.content
+              });
+              composeView.setSubject(res.data.subject);
               // axios.get(`http://127.0.0.1:5000/api/${query}`)
               // axios.get(`http://127.0.0.1:5000/api`)
               // .then(res => {
@@ -93,10 +133,15 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               // });
             }
           },
-          // mounted(){
-          //   let logoIcon = document.getElementById("logoIcon");
-          //   logoIcon.src = chrome.extension.getURL('images/icon.png');
-          // },
+          mounted(){
+            if(userText != '') {
+              this.userTextVisible = true;
+              this.userText = userText;
+              document.getElementById("user-text").innerHTML = this.userText;
+            }
+            // let logoIcon = document.getElementById("logoIcon");
+            // logoIcon.src = chrome.extension.getURL('images/icon.png');
+          },
           data() {
             return {
               buttons : [  
@@ -104,13 +149,25 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                 {id : 2, label : 'I have shared your resume with Together'},
                 {id : 3, label : 'I will share the resume and get back to you'}
               ],
-              lorem : {
-                txt : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc mattis sagittis hendrerit. Nulla faucibus ante at ex finibus vulputate.",
-              },
-              label : [
+              lorem : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc mattis sagittis hendrerit. Nulla faucibus ante at ex finibus vulputate.",
+              labels : [
               ],
+              userText:"",
+              userTextVisible : true,
+              userTextStyle : {
+                'padding' : '5px 0px'
+              },
+              contact : {
+                phone: ''
+              },
+              noSendColor : {
+                'color' : '#1475E1'
+              },
+              fullWidth : {
+                'width' : '100%'
+              },
               header: {
-                'padding': '13px 3px 3px 13px',
+                'padding': '13px 13px 3px 13px',
                 'font-size': '15px',
                 'display' : 'flex',
                 'border-radius': '20px 20px 0px 0px' 
@@ -125,7 +182,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                 'display' : 'flex',
                 'border-radius': '0px 0px 20px 20px',
                 'background': '#303030',
-                'height': '30px',
+                'padding' : '15px'
               },
               headerTitle: {
                 'height' : '40px',
@@ -140,6 +197,13 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               logoIcon:{
                 'width' : '40px',
                 'height' : '40px',
+              },
+              input_contact: {
+                'display' : 'flex'
+              },
+              input_contact_child: {
+                'margin-left' : '13px',
+                'padding' : '5px 0px'
               },
               fColorWhite : {
                 'color': 'white',
@@ -160,6 +224,9 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               standard : {
                 'margin': '0',
                 'background': '#303030',
+              },
+              margin0 : {
+                'margin': '0',
               },
               row : {
                 'display' : 'block'
@@ -195,21 +262,18 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           return arr.filter((obj) => obj.id !== id);
         }
 
-        function getMailContent(content, addition = "") {
+        function getUserText(content) {
+          if(content.search("mail-content") == -1) return content;
           let parser = new DOMParser();
           let doc = parser.parseFromString(content, 'text/html');
+          let userText = '';
           try {
-            doc.getElementById("button-body").remove();
+            const user_text = doc.getElementById("user-text");
+            userText = user_text.innerHTML;
           } catch (error) {
-            console.log("No button body!")
+            console.log("No user text!")
           }
-          let mail = doc.getElementById("mail-content");
-          if(mail != null){
-            content = mail.innerHTML;
-          }
-          if(addition != "") content += addition;
-          let new_content = '<div id="mail-content">' + content + '</div>';
-          return new_content;
+          return userText;
         }
       },
     });
@@ -224,21 +288,29 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         const text_body = doc.getElementById("text-body").innerHTML;
         try {
           doc.getElementById("button-body").remove();
+          doc.getElementById("user-title").remove();
         } catch (error) {
-          console.log("No button body!")
+          console.log("No item to remove!")
         }
+        let userTextConent = doc.getElementById("user-text").innerText;
+        if(userTextConent.length == 0) 
+          doc.getElementById("user-text").remove();
         let mail = doc.getElementById("mail-content");
         if(mail != null){
           content = mail.innerHTML;
         }
-        content += text_body;
-        let new_content = '<div id="mail-content">' + content + '</div>';
-        return new_content;
+        return content;
       }
     });
     composeView.on('sent', (event) => {
       const threadID = composeView.getThreadID();
       console.log("Sent ========>", threadID);
+      // axios.get(`http://127.0.0.1:5000/api/send?threadid=${threadID}`)
+      // .then(res => {
+      //   if (res.status === 200) {
+      //     console.log("Sent threadID");
+      //   }
+      // });
     });
   });
 });
