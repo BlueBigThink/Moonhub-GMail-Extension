@@ -1,6 +1,7 @@
 InboxSDK.loadScript('https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js')
 InboxSDK.loadScript('https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js')
 // require('./main.css');
+localStorage.setItem("login", "false");//TODO
 
 InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
    // the SDK has been loaded, now do something with it!
@@ -15,8 +16,9 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         let userText = getUserText(content);
         let email_Body = '<div id="email-body"></div>';
 
+        let modalView = null;
         if(!(await isLoggedIn())) {
-          sdk.Widgets.showModalView({
+          modalView = sdk.Widgets.showModalView({
             'el': `<div id="google-signin"></div>`,
             chrome : false
           });
@@ -28,13 +30,23 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           el: '#google-signin',
           template: `
             <div id="google-signin-body">
-              <button class="login-with-google-btn">Sign in with Google</button>
+              <button class="login-with-google-btn" @click="handleSignIn">Sign in with Google</button>
             </div>
           `,
-          data() {
-            return {
+          methods:{
+            handleSignIn(event){
+              localStorage.setItem("login", "true");//TODO
+              modalView.close();
             }
           },
+          data(){
+            return {
+              isLoggedIn : false
+            }
+          },
+          mounted(){
+            this.isLoggedIn = false;
+          }
         });
 
         const emailBody = new Vue({
@@ -281,7 +293,8 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         });
 
         async function isLoggedIn(...args){
-          return false;
+          const logValue = localStorage.getItem("login");
+          return logValue == 'true';
         }
 
         function removeAt(arr, id) {
