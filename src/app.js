@@ -1,5 +1,6 @@
 InboxSDK.loadScript('https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js')
 InboxSDK.loadScript('https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js')
+// require('./main.css');
 
 InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
    // the SDK has been loaded, now do something with it!
@@ -8,12 +9,33 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
     composeView.addButton({
       title: "Moonhub",
       iconUrl: chrome.extension.getURL('images/icon.png'),
-      onClick: function(event) {
+      onClick: async function(event) {
+
         const content = composeView.getHTMLContent();
         let userText = getUserText(content);
-        console.log(userText);
         let email_Body = '<div id="email-body"></div>';
-        composeView.setBodyHTML(email_Body);
+
+        if(!(await isLoggedIn())) {
+          sdk.Widgets.showModalView({
+            'el': `<div id="google-signin"></div>`,
+            chrome : false
+          });
+        } else {
+          composeView.setBodyHTML(email_Body);    
+        }
+
+        const googleSignIn = new Vue({
+          el: '#google-signin',
+          template: `
+            <div id="google-signin-body">
+              <button class="login-with-google-btn">Sign in with Google</button>
+            </div>
+          `,
+          data() {
+            return {
+            }
+          },
+        });
 
         const emailBody = new Vue({
           el: '#email-body',
@@ -257,6 +279,10 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             }
           },
         });
+
+        async function isLoggedIn(...args){
+          return false;
+        }
 
         function removeAt(arr, id) {
           return arr.filter((obj) => obj.id !== id);

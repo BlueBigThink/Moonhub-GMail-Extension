@@ -13,11 +13,12 @@
   "content_scripts" : [
     {
       "matches": ["https://mail.google.com/*", "https://inbox.google.com/*"],
-      "js": ["inboxsdk.js", "app.js"]
+      "js": ["src/inboxsdk.js", "src/app.js"],
+      "css": ["src/main.css"]
     }
   ],
   "web_accessible_resources": [
-    "images/*"
+    "images/*", "src/*"
   ],
   "icons": {
     "128": "images/icon.png"
