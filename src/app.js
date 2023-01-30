@@ -1,6 +1,6 @@
 InboxSDK.loadScript('https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js')
 InboxSDK.loadScript('https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js')
-// require('./main.css');
+
 localStorage.setItem("login", "false");//TODO
 
 InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
@@ -35,8 +35,12 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           `,
           methods:{
             handleSignIn(event){
-              localStorage.setItem("login", "true");//TODO
-              modalView.close();
+              chrome.runtime.sendMessage({ message: 'login' },function(response){
+                if(response.message == 'success'){
+                }
+                localStorage.setItem("login", "true");//TODO
+                modalView.close();
+              });
             }
           },
           data(){

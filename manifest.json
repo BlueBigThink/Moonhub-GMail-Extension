@@ -17,6 +17,9 @@
       "css": ["src/main.css"]
     }
   ],
+  "background":{
+    "scripts": ["src/background.js"]
+  },
   "web_accessible_resources": [
     "images/*", "src/*"
   ],
