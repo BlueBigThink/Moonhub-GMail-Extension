@@ -29,8 +29,10 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         const googleSignIn = new Vue({
           el: '#google-signin',
           template: `
-            <div id="google-signin-body">
-              <button class="login-with-google-btn" @click="handleSignIn">Sign in with Google</button>
+            <div>
+              <div id="google-signin-body">
+                <button class="login-with-google-btn" @click="handleSignIn">Sign in with Google</button>
+              </div>
             </div>
           `,
           methods:{
