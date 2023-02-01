@@ -37,11 +37,23 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           `,
           methods:{
             handleSignIn(event){
+              let curUser = sdk.User.getEmailAddress();
+              console.log(curUser);
+              modalView.close();
               chrome.runtime.sendMessage({ message: 'login' },function(response){
-                if(response.message == 'success'){
-                }
-                localStorage.setItem("login", "true");//TODO
-                modalView.close();
+                // if(response.message == 'success'){
+                // }
+                axios.get(`http://127.0.0.1:5000/api/signin?useraddress=${curUser}`)
+                .then(res => {
+                  if (res.status === 200) {
+                    bSigned = res.data.signin;
+                    if(bSigned){
+                      localStorage.setItem("login", "true");//TODO
+                    }else{
+                      localStorage.setItem("login", "false");//TODO
+                    }
+                  }
+                });
               });
             }
           },
