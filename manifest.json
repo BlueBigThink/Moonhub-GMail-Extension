@@ -7,7 +7,12 @@
     "https://mail.google.com/",
     "https://inbox.google.com/",
     "https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js",
-    "https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"
+    "https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js",
+    "https://*/"
+  ],
+  "host_permissions": [
+    "https://mail.google.com/",
+    "*://*/*"
   ],
   "content_scripts" : [
     {

@@ -1,8 +1,6 @@
 InboxSDK.loadScript('https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js')
 InboxSDK.loadScript('https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js')
 
-localStorage.setItem("login", "false");//TODO
-
 InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
    // the SDK has been loaded, now do something with it!
    sdk.Compose.registerComposeViewHandler(function(composeView){
@@ -11,21 +9,40 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
       title: "Moonhub",
       iconUrl: chrome.extension.getURL('images/icon.png'),
       onClick: async function(event) {
-
-        const content = composeView.getHTMLContent();
-        let userText = getUserText(content);
-        let email_Body = '<div id="email-body"></div>';
-
-        let modalView = null;
-        if(!(await isLoggedIn())) {
-          modalView = sdk.Widgets.showModalView({
-            'el': `<div id="google-signin"></div>`,
-            chrome : false
+        let threadID = composeView.getThreadID();
+        if(threadID == ''){
+          console.log('This is new email. Not reply!');
+        }else{
+          axios.get(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/thread-emails/${threadID}`, {
+            headers : {
+              'Content-Type' : 'application/json'
+            }
+          })
+          .then(res => {
+            if (res.status === 200) {
+              email_contents = res.data.emails[0];
+              console.log(email_contents);
+              email_contents = '<pre style="white-space : pre-wrap">' + email_contents + '</pre>';
+              composeView.setBodyHTML(email_contents);   
+            } else {
+              console.log(res.error);
+            }
           });
-        } else {
-          composeView.setBodyHTML(email_Body);    
         }
+        // const content = composeView.getHTMLContent();
+        // let userText = getUserText(content);
+        // let email_Body = '<div id="email-body"></div>';
 
+        // let modalView = null;
+        // if(!(await isLoggedIn())) {
+        //   modalView = sdk.Widgets.showModalView({
+        //     'el': `<div id="google-signin"></div>`,
+        //     chrome : false
+        //   });
+        // } else {
+        //  composeView.setBodyHTML(email_Body);    
+        // }
+/*
         const googleSignIn = new Vue({
           el: '#google-signin',
           template: `
@@ -66,7 +83,8 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             this.isLoggedIn = false;
           }
         });
-
+*/
+        /*
         const emailBody = new Vue({
           el: '#email-body',
           template: `
@@ -92,39 +110,24 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                     </div>
                   </template>
                 </div>
-                <form>
-                  <div id="input-contact" :style="input_contact">
-                    <div :style="input_contact_child">
-                      <template>
-                        <label for="input-phone">Phone(Optional):</label>
-                        <input type="number" id="input-phone" name="input-phone" @change="inputPhoneHandle" :value="contact.phone">
-                      </template>
-                    </div>
-                  </div>
-                </form>
               </div>
               <div id="text-body" :style="[row, paper]">
                 <template v-for="label in labels">
                   <div :style="[fColorWhite]">
                     <h3 :style="[margin0]">{{label.title}}</h3>
-                    <span>{{label.content}}</span>
+                    <pre :style="[wrap, margin0]">{{label.content}}</pre>
                   </div>
                 </template>
                 <template v-if="userTextVisible == true">
                   <div :style="userTextStyle">
                     <div id="user-title" :style="[fColorWhite]">
-                      <h3 :style="[margin0, noSendColor]">Additional Content(No Send) : &#x23CE;</h3>
+                      <h3 :style="[margin0, noSendColor]">Additional Content(<= No Send) : &#x23CE;</h3>
                     </div>
                     <div id="user-text" :style="[margin0, fColorWhite]">&nbsp;</div>
                   </div>
                 </template>
               </div>
               <div id="footer" :style="[footer]">
-                <div :style="[fColorWhite, alignCenter, fullWidth]">
-                  <template v-if="contact.phone != ''">
-                    <h3 :style="[margin0]">You can call me by phone : {{contact.phone}}</h3>
-                  </template>
-                </div>
               </div>
             </div>
           `,
@@ -161,7 +164,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                 }
               }
               this.labels.push({
-                title : label,
+                title : "",
                 content : res.data.content
               });
               composeView.setSubject(res.data.subject);
@@ -174,15 +177,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               //     composeView.setBodyHTML(mail_content);
               //   }
               // });
-              //For Test
-              // axios.get(`https://dog.ceo/api/breeds/image/random`)
-              // .then(res => {
-              //   if (res.status === 200) {
-              //     mail_content = res.data.message;
-              //     mail_content = makeMailContent(mail_content);
-              //     composeView.setBodyHTML(mail_content);
-              //   }
-              // });
             }
           },
           mounted(){
@@ -191,17 +185,39 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               this.userText = userText;
               document.getElementById("user-text").innerHTML = this.userText;
             }
+            let threadID = composeView.getThreadID();
+            if(threadID == ''){
+              console.log('This is new email. Not reply!');
+            }else{
+              axios.get(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/thread-emails/${threadID}`, {
+                headers : {
+                  'Content-Type' : 'application/json'
+                }
+              })
+              .then(res => {
+                if (res.status === 200) {
+                  email_contents = res.data.emails[0];
+                  console.log(email_contents);
+                  this.labels.push({
+                    title : '',
+                    content : email_contents
+                  });
+                } else {
+                  console.log(res.error);
+                }
+              });
+            }
+    
             // let logoIcon = document.getElementById("logoIcon");
             // logoIcon.src = chrome.extension.getURL('images/icon.png');
           },
           data() {
             return {
               buttons : [  
-                {id : 1, label : 'Send them my calendly'},
-                {id : 2, label : 'I have shared your resume with Together'},
-                {id : 3, label : 'I will share the resume and get back to you'}
+                // {id : 1, label : 'Send them my calendly'},
+                // {id : 2, label : 'I have shared your resume with Together'},
+                // {id : 3, label : 'I will share the resume and get back to you'}
               ],
-              lorem : "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc mattis sagittis hendrerit. Nulla faucibus ante at ex finibus vulputate.",
               labels : [
               ],
               userText:"",
@@ -211,6 +227,9 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               },
               contact : {
                 phone: ''
+              },
+              wrap : {
+                'white-space' : 'pre-wrap'
               },
               noSendColor : {
                 'color' : '#1475E1'
@@ -309,7 +328,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             }
           },
         });
-
+        */
         async function isLoggedIn(...args){
           const logValue = localStorage.getItem("login");
           return logValue == 'true';
@@ -335,29 +354,29 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
       },
     });
     composeView.on('presending', (event) => {
-      let content = composeView.getHTMLContent();
-      content = getMailContent(content);
-      composeView.setBodyHTML(content);
+      // let content = composeView.getHTMLContent();
+      // content = getMailContent(content);
+      // composeView.setBodyHTML(content);
 
-      function getMailContent(content) {
-        let parser = new DOMParser();
-        let doc = parser.parseFromString(content, 'text/html');
-        const text_body = doc.getElementById("text-body").innerHTML;
-        try {
-          doc.getElementById("button-body").remove();
-          doc.getElementById("user-title").remove();
-        } catch (error) {
-          console.log("No item to remove!")
-        }
-        let userTextConent = doc.getElementById("user-text").innerText;
-        if(userTextConent.length == 0) 
-          doc.getElementById("user-text").remove();
-        let mail = doc.getElementById("mail-content");
-        if(mail != null){
-          content = mail.innerHTML;
-        }
-        return content;
-      }
+      // function getMailContent(content) {
+      //   let parser = new DOMParser();
+      //   let doc = parser.parseFromString(content, 'text/html');
+      //   const text_body = doc.getElementById("text-body").innerHTML;
+      //   try {
+      //     doc.getElementById("button-body").remove();
+      //     doc.getElementById("user-title").remove();
+      //   } catch (error) {
+      //     console.log("No item to remove!")
+      //   }
+      //   let userTextConent = doc.getElementById("user-text").innerText;
+      //   if(userTextConent.length == 0) 
+      //     doc.getElementById("user-text").remove();
+      //   let mail = doc.getElementById("mail-content");
+      //   if(mail != null){
+      //     content = mail.innerHTML;
+      //   }
+      //   return content;
+      // }
     });
     composeView.on('sent', (event) => {
       const threadID = composeView.getThreadID();
