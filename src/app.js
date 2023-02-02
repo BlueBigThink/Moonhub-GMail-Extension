@@ -20,7 +20,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           })
           .then(res => {
             if (res.status === 200) {
-              email_contents = res.data.emails[0];
+              email_contents = res.data.ai_emails;
               console.log(email_contents);
               email_contents = '<pre style="white-space : pre-wrap">' + email_contents + '</pre>';
               composeView.setBodyHTML(email_contents);   
