@@ -13,8 +13,8 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         if(threadID == ''){
           console.log('This is new email. Not reply!');
         }else{
-          axios.get(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/thread-emails/${threadID}`, {
-            headers : {
+          axios.get(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/ai-email/${threadID}`, {
+              headers : {
               'Content-Type' : 'application/json'
             }
           })
