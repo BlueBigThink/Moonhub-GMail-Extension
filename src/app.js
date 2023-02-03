@@ -12,37 +12,39 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
       hasDropdown: true,
       onClick: async function(event) {
         event.dropdown.el.innerHTML = '<div id="drop-down-menu"></div>';
-        const googleSignIn = new Vue({
+        const suggestion_word_list = new Vue({
           el: '#drop-down-menu',
           template: `
-            <div>
-              <div id="word-suggestion-list">
+            <div id="word-suggestion-list">
               <ul>
+                <div class="li-search">
+                  <input id="#input-search" class="input-grey-rounded" type="text" placeholder="Search for anything here..."/>
+                </div>
                 <li v-for="sentence in sentences">
                   {{sentence}}
                 </li>
-                </ul>
-              </div>
+              </ul>
             </div>
           `,
           data(){
             return {
               sentences : [
-                "Send them my calendly",
-                "I will share the resume and get back to you",
-                "I have shared your resume with together",
-                "I want to say something",
-                "You busy? Have some time?",
-                "Nice to meet you",
-                "I want to say something",
-                "You busy? Have some time?",
-                "Nice to meet you"
+                "say it's great to hear from them",
+                "send calendly link",
+                "provide compensation details",
+                "Libero massa dolor. Nibh sed nec, non neque",
+                "You busy? have some time?",
+                "Nice to meet you!",
+                "say to him",
               ]
             }
           },
+          mounted(){
+            var inboxDropdown = document.getElementById("word-suggestion-list").parentElement;
+            inboxDropdown.style.border = '0px solid black';
+            inboxDropdown.style["boxShadow"] = 'none';
+          }
         });
-
-    
         // let threadID = composeView.getThreadID();
         // if(threadID == ''){
         //   console.log('This is new email. Not reply!');
