@@ -8,61 +8,27 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
     composeView.addButton({
       title: "Moonhub",
       iconUrl: chrome.extension.getURL('images/icon.png'),
-      chrome : false,
-      hasDropdown: true,
       onClick: async function(event) {
-        event.dropdown.el.innerHTML = '<div id="drop-down-menu"></div>';
-        const googleSignIn = new Vue({
-          el: '#drop-down-menu',
-          template: `
-            <div>
-              <div id="word-suggestion-list">
-              <ul>
-                <li v-for="sentence in sentences">
-                  {{sentence}}
-                </li>
-                </ul>
-              </div>
-            </div>
-          `,
-          data(){
-            return {
-              sentences : [
-                "Send them my calendly",
-                "I will share the resume and get back to you",
-                "I have shared your resume with together",
-                "I want to say something",
-                "You busy? Have some time?",
-                "Nice to meet you",
-                "I want to say something",
-                "You busy? Have some time?",
-                "Nice to meet you"
-              ]
+        let threadID = composeView.getThreadID();
+        if(threadID == ''){
+          console.log('This is new email. Not reply!');
+        }else{
+          axios.get(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/ai-email/${threadID}`, {
+              headers : {
+              'Content-Type' : 'application/json'
             }
-          },
-        });
-
-    
-        // let threadID = composeView.getThreadID();
-        // if(threadID == ''){
-        //   console.log('This is new email. Not reply!');
-        // }else{
-        //   axios.get(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/ai-email/${threadID}`, {
-        //       headers : {
-        //       'Content-Type' : 'application/json'
-        //     }
-        //   })
-        //   .then(res => {
-        //     if (res.status === 200) {
-        //       email_contents = res.data.ai_emails;
-        //       console.log(email_contents);
-        //       email_contents = '<pre style="white-space : pre-wrap">' + email_contents + '</pre>';
-        //       composeView.setBodyHTML(email_contents);   
-        //     } else {
-        //       console.log(res.error);
-        //     }
-        //   });
-        // }
+          })
+          .then(res => {
+            if (res.status === 200) {
+              email_contents = res.data.ai_emails;
+              console.log(email_contents);
+              email_contents = '<pre style="white-space : pre-wrap">' + email_contents + '</pre>';
+              composeView.setBodyHTML(email_contents);   
+            } else {
+              console.log(res.error);
+            }
+          });
+        }
         // const content = composeView.getHTMLContent();
         // let userText = getUserText(content);
         // let email_Body = '<div id="email-body"></div>';
