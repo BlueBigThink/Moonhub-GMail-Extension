@@ -30,55 +30,67 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         el: '#moonhub-container-elm',
         template: `
           <div id="moonhub-container">
-            <template v-if="topicDetected">
-              <div id="moonhub-tool-container" :style="[tool_container]">
-                <div id="generator-container">
-                  <div class="generator-title">
-                    <div class="title-icon"></div>
-                    <div class="title-content">
-                      <div class="title-top">3 topics detected</div>
-                      <div class="title-bottom">Generate text</div>
+            <div class="monnhub-container-relative">
+              <template v-if="topicDetected">
+                <div id="moonhub-tool-container" :style="[tool_container]">
+                  <div id="generator-container">
+                    <div class="generator-title">
+                      <div class="title-icon"></div>
+                      <div class="title-content">
+                        <div class="title-top">3 topics detected</div>
+                        <div class="title-bottom">Generate text</div>
+                      </div>
+                    </div>
+                    <div class="generator-body">
+                      <pre class="generator-body-content">{{ai_email}}</pre>
+                    </div>
+                    <div class="generator-button">
+                      <button class="btn-cancel">Cancel</button>
+                      <button class="btn-generate">Generate</button>
                     </div>
                   </div>
-                  <div class="generator-body">
-                    <pre class="generator-body-content">{{ai_email}}</pre>
-                  </div>
-                  <div class="generator-button">
-                    <button class="btn-cancel">Cancel</button>
-                    <button class="btn-generate">Generate</button>
-                  </div>
-                </div>
-                <div class="tool-button">
-                  <div class="round-btn"></div>
-                  <div class="round-button-label">
-                    <div class="round-button-label-content">3 topics detected</div>
+                  <div class="tool-button">
+                    <div class="round-button-label">
+                      <div class="round-button-label-content">3 topics detected</div>
+                    </div>
+                    <div class="round-btn"></div>
                   </div>
                 </div>
-              </div>
-            </template>
-            <template v-else>
-              <div class="round-btn only-btn"></div>
-            </template>
+              </template>
+              <template v-else>
+                <div class="round-btn only-btn"></div>
+              </template>
+            </div>
           </div>
         `,
         data() {
           return {
             ai_email : "Hi Mary,\nIt’s great to hear from you today!\nThe compensation for the SWE role is 100,000 - 150,000$.\nIf you are interested in moving forward can you find a time on my calendly here: calendly.com/nancy?",
-            // ai_email : "Hi Mary,\nIt’s great to hear from you today!",
-            topicDetected : false,
+            topicDetected : true,
             tool_container : {
             },
           }
         },
         mounted(){
-          nBottom = style.bottom;
-          nRight = style.right;
-          this.tool_container['bottom'] = nBottom;
-          this.tool_container['right'] = nRight;
-          // this.tool_container['position'] = 'absolute';
+          const offset = getOffset(el);
+          const right = window.innerWidth - parseInt(style.width.toString()) - offset.left;
+          const bottom = window.innerHeight - parseInt(style.height.toString()) - offset.top;
+          let moonhub = document.getElementById('moonhub-tool-container');
+          mRight = (right + 20) + 'px';
+          mBottom = (bottom + 20) + 'px';
+          moonhub.style.right = mRight;
+          moonhub.style.bottom = mBottom;
         }
       });
       g_bMoonhubApp = true;
+    }
+
+    function getOffset(el) {
+      const rect = el.getBoundingClientRect();
+      return {
+        left: rect.left + window.scrollX,
+        top: rect.top + window.scrollY
+      };
     }
 
     function rmMoonhubApp(){
@@ -104,17 +116,28 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             <div id="word-suggestion-list">
               <ul>
                 <div class="li-search">
-                  <input id="#input-search" class="input-grey-rounded" type="text" placeholder="Search for anything here..."/>
+                  <input  id="#input-search" 
+                          class="input-grey-rounded" 
+                          type="text" 
+                          placeholder="Search for anything here..."
+                          v-model="searchInput"
+                          v-on:input="handleSearchInput"
+                  />
                 </div>
-                <li v-for="sentence in sentences">
-                  {{sentence}}
-                </li>
+                <template v-for="sentence in sentences">
+                  <li :title="sentence" @click="handleItem">
+                    {{sentence}}
+                  </li>
+                </template>
               </ul>
             </div>
           `,
           data(){
             return {
+              searchInput : '',
               sentences : [
+              ],
+              all : [
                 "say it's great to hear from them",
                 "send calendly link",
                 "provide compensation details",
@@ -129,6 +152,15 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             var inboxDropdown = document.getElementById("word-suggestion-list").parentElement;
             inboxDropdown.style.border = '0px solid black';
             inboxDropdown.style["boxShadow"] = 'none';
+            this.all.forEach(item => this.sentences.push(item));
+          },
+          methods:{
+            handleItem(event){
+              const content = event.target.title;
+            },
+            handleSearchInput(event){
+              this.sentences = this.all.filter(item => item.search(this.searchInput) > -1);
+            },
           }
         });
         // let threadID = composeView.getThreadID();

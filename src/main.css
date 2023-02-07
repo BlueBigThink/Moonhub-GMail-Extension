@@ -140,10 +140,16 @@ input{
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 2147483647;
+    z-index: 2147483648;
     position: absolute;
     pointer-events: none;
-    /* background-color: purple; */
+}
+
+.monnhub-container-relative {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    pointer-events: auto;
 }
 
 #moonhub-tool-container {
@@ -152,8 +158,6 @@ input{
     height: 296px;
     
     position: absolute;
-    bottom: 100px;
-    right: 100px;
 }
 
 #generator-container {
@@ -193,7 +197,6 @@ input{
     font-size: 12px;
     line-height: 16px;
     color: #49AB5E;
-
 }
 
 .title-bottom {
@@ -235,11 +238,19 @@ input{
     display: flex;
     bottom: 0;
     right: 0;
-    width: 177px;
-    /* width: 32px; */
+    /* width: 177px; */
+    width: 32px;
     height: 32px;
     border-radius: 16px;
     background-color: #49AB5E;
+    cursor: pointer;
+    transition: width 0.2s;
+    color: transparent;
+}
+
+.tool-button:hover {
+    width: 177px;
+    color: white;
 }
 
 .round-btn {
@@ -250,24 +261,25 @@ input{
 }
 
 .round-button-label {
-    width: 145px;
+    position: absolute;
+    width: 100%;
     height: 32px;
     background: transparent;
     display: table;
     text-align: center;
-    overflow: hidden;
-    color: #FFF;
+    /* color: #FFF; */
 }
 .round-button-label-content {
     display: table-cell;
     vertical-align: middle;
     background: transparent;
-    padding-right: 32px;
     font-family: 'Silka';
     font-style: normal;
     font-weight: 600;
     font-size: 14px;
     line-height: 16px;
+    width:100%;
+    overflow: hidden;
 }
 
 .only-btn {
@@ -303,6 +315,7 @@ input{
     font-weight: 600;
     font-size: 14px;
     color: #5F2EE5;
+    cursor: pointer;
 }
 
 .btn-generate {
@@ -318,4 +331,5 @@ input{
     font-size: 14px;
     line-height: 20px;
     color: #FFFFFF;
+    cursor: pointer;
 }
