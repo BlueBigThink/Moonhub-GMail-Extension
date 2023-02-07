@@ -36,3 +36,53 @@
     text-align: center;
     padding: 30px;
 }
+.inboxsdk__menu > .inboxsdk__menuContent  {
+    border : 0;
+    box-shadow: none;
+}
+#word-suggestion-list {
+    width: 352px;
+    height: 271px;
+    border : 1px solid #EDEDED;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 16px 6px 16px 16px;
+}
+ul {
+    position: static;
+    padding: 0 6px 0 0;
+    width: calc(100% - 6px);
+    height: 100%;
+    list-style: none;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+ul > li {
+    background: #FFFFFF;
+    cursor: pointer;
+    margin : 4px 0px;
+    border : 1px solid #EDEDED;
+    padding: 8px 12px 8px 12px;
+    border-radius: 6px;
+    gap: 10px;
+    font-family: 'Silka';
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+ul > li:hover {
+    border: 1px solid #5F2EE5;
+}
+::-webkit-scrollbar {
+    width: 4px;
+}
+::-webkit-scrollbar-track {
+    background: none;
+}
+::-webkit-scrollbar-thumb {
+    height: 174px;
+    background: #D9D9D9;
+    border-radius: 8px;
+}
