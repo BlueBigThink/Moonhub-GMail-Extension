@@ -4,15 +4,18 @@
   "version": "1.0",
   "description": "Moonhub Inbox Extension",
   "permissions": [
+    "https://google.com/",
     "https://mail.google.com/",
     "https://inbox.google.com/",
     "https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js",
     "https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js",
-    "https://*/"
-  ],
+    "https://*/*",
+    "http://*/*",
+    "https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/"
+    ],
   "host_permissions": [
-    "https://mail.google.com/",
-    "*://*/*"
+    "<all_urls>",
+    "https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/"
   ],
   "content_scripts" : [
     {
