@@ -48,11 +48,15 @@
 
 #word-suggestion-list {
     width: 352px;
-    height: 271px;
+    max-height: 271px;
+    min-height: 36px;
+    height: fit-content;
     border : 1px solid #EDEDED;
     border-radius: 8px;
     margin-bottom: 10px;
     padding: 16px 6px 16px 16px;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 ul {
     position: static;
@@ -61,8 +65,6 @@ ul {
     height: 100%;
     list-style: none;
     margin: 0;
-    overflow-x: hidden;
-    overflow-y: scroll;
 }
 ul > li {
     background: #FFFFFF;
@@ -134,6 +136,9 @@ input{
 /********************************************************/
 /******************* Moonhub container ******************/
 /********************************************************/
+button {
+    background-color: transparent;
+}
 
 #moonhub-container {
     top: 0;
@@ -149,7 +154,7 @@ input{
     width: 100%;
     height: 100%;
     position: relative;
-    pointer-events: auto;
+    pointer-events: none;
 }
 
 #moonhub-tool-container {
@@ -158,6 +163,7 @@ input{
     height: 296px;
     
     position: absolute;
+    pointer-events: auto;
 }
 
 #generator-container {
@@ -219,6 +225,7 @@ input{
     border: 1px solid #EDEDED;
     border-top: none;
     border-bottom: none;
+    cursor: pointer;
 }
 
 .generator-body-content {
@@ -241,11 +248,13 @@ input{
     /* width: 177px; */
     width: 32px;
     height: 32px;
+    border : none;
     border-radius: 16px;
     background-color: #49AB5E;
     cursor: pointer;
     transition: width 0.2s;
     color: transparent;
+    padding: 0;
 }
 
 .tool-button:hover {
@@ -284,8 +293,11 @@ input{
 
 .only-btn {
     position: absolute;
-    bottom: 100px;
-    right: 100px;
+    bottom: 0;
+    right: 0;
+    border: none;
+    padding: 0;
+    cursor: pointer;
 }
 
 .generator-button {
