@@ -32,6 +32,8 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
       var div=document.createElement("div"); 
       div.setAttribute("id", "moonhub-container-elm");
       document.body.appendChild(div); 
+
+      //Moonhub Container Element in Browser
       const moonhub_container_elm = new Vue({
         el: '#moonhub-container-elm',
         template: `
@@ -44,7 +46,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                     <div class="generator-title moonhub">
                       <div class="title-icon moonhub"></div>
                       <div class="title-content  moonhub">
-                        <div class="title-top moonhub">{{sTopicDetected}}</div>
                         <div class="title-bottom moonhub">Generate text</div>
                       </div>
                     </div>
@@ -52,17 +53,21 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                       <pre class="generator-body-content moonhub">{{ai_email}}</pre>
                     </div>
                     <div class="generator-button moonhub">
-                      <button class="btn-cancel moonhub" @click="handleCancel">Cancel</button>
-                      <button class="btn-generate moonhub" @click="handleGenerate">Generate</button>
+                    <button class="btn-refresh moonhub" @click="handleGenerate">Retry</button>
+                    <button class="btn-cancel moonhub" @click="handleCancel">Cancel</button>
+                    <button class="btn-generate moonhub" @click="handleReplaceEmail">Keep</button>
                     </div>
                   </div>
+                  <button class="cross-btn only-btn moonhub" @click="handleCancel"></button>
                 </template>
-                <button class="tool-button moonhub" @click="handleToolButton">
-                  <div class="round-button-label moonhub">
-                    <div class="round-button-label-content moonhub">{{sTopicDetected}}</div>
-                  </div>
-                  <div class="round-btn moonhub"></div>
-                </button>
+                <template v-else>
+                  <button class="tool-button moonhub" @click="handleToolButton">
+                    <div class="round-button-label moonhub">
+                      <div class="round-button-label-content moonhub">{{sTopicDetected}}</div>
+                    </div>
+                    <div class="round-btn moonhub"></div>
+                  </button>
+                </template>
               </template>
               <template v-else>
                 <button class="round-btn only-btn moonhub"></button>
@@ -102,14 +107,41 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               }
             }, 500);
           },
+          getAIEmail(){
+            const email_content = composeView.getHTMLContent();
+            //TODO
+            axios({
+              method: 'POST',
+              url : `https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/get-ai-email/`,
+              headers : {
+                'Content-Type' : 'application/json'
+              },
+              data : {
+                text : email_content
+              }
+            })
+            .then(res => {
+              if (res.status === 200) {
+                //TODO
+                this.ai_email = res.data.ai_email;
+                console.log(ai_email);
+              } else {
+                console.log(res.error);
+              }
+            });  
+          },
           handleToolButton(event){
             this.bShowGenerate = true;
             g_bShowGenerate = true;
           },
-          handleGenerate(event){},
+          handleGenerate(event){
+            this.getAIEmail();
+          },
           handleCancel(event){
             this.bShowGenerate = false;
             g_bShowGenerate = false;
+            const el_Arr = document.querySelectorAll('[g_editable="true"]');
+            el_Arr[0].focus();
           },
           handleReplaceEmail(event){
             composeView.setBodyHTML('<pre style="white-space : pre-wrap">' + this.ai_email + '</pre>');
@@ -194,13 +226,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               sentences : [
               ],
               all : [
-                "say it's great to hear from them",
-                "send calendly link",
-                "provide compensation details",
-                "Libero massa dolor. Nibh sed nec, non neque",
-                "You busy? have some time?",
-                "Nice to meet you!",
-                "say to him",
               ]
             }
           },
@@ -208,9 +233,42 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             var inboxDropdown = document.getElementById("word-suggestion-list").parentElement;
             inboxDropdown.style.border = '0px solid black';
             inboxDropdown.style["boxShadow"] = 'none';
-            this.all.forEach(item => this.sentences.push(item));
+            //TODO
+            this.all.push("say it's great to hear from them");
+            this.all.push("send calendly link");
+            this.all.push("provide compensation details");
+            this.all.push("Libero massa dolor. Nibh sed nec, non neque");
+            this.all.push("You busy? have some time?");
+            this.all.push("Nice to meet you!");
+            this.all.push("say to him");
+            this.all.forEach(item => this.sentences.push(item));//TODO
           },
           methods:{
+            getSuggestionList(completion){
+              //TODO
+              axios({
+                method: 'POST',
+                url : `https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/get-suggestion/`,
+                headers : {
+                  'Content-Type' : 'application/json'
+                },
+                data : {
+                  text : completion
+                }
+              })
+              .then(res => {
+                if (res.status === 200) {
+                  //TODO
+                  suggesion_list = res.data.list;
+                  console.log(suggesion_list);
+                  suggesion_list.forEach(item => {
+                    this.sentences.push(item);
+                  });
+                } else {
+                  console.log(res.error);
+                }
+              });  
+            },  
             handleItem(event){
               const content = event.target.title;
               //TODO
@@ -222,6 +280,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                 email = email + `<div>${content}</div>`;
               }
               composeView.setBodyHTML(email);
+              getSuggestionList(content);
             },
             handleSearchInput(event){
               this.sentences = this.all.filter(item => item.search(this.searchInput) > -1);
@@ -232,21 +291,21 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         // if(threadID == ''){
         //   console.log('This is new email. Not reply!');
         // }else{
-        //   axios.get(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/ai-email/${threadID}`, {
-        //       headers : {
-        //       'Content-Type' : 'application/json'
-        //     }
-        //   })
-        //   .then(res => {
-        //     if (res.status === 200) {
-        //       email_contents = res.data.ai_emails;
-        //       console.log(email_contents);
-        //       email_contents = '<pre style="white-space : pre-wrap">' + email_contents + '</pre>';
-        //       composeView.setBodyHTML(email_contents);   
-        //     } else {
-        //       console.log(res.error);
-        //     }
-        //   });
+          // axios.get(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/ai-email/${threadID}`, {
+          //     headers : {
+          //     'Content-Type' : 'application/json'
+          //   }
+          // })
+          // .then(res => {
+          //   if (res.status === 200) {
+          //     email_contents = res.data.ai_emails;
+          //     console.log(email_contents);
+          //     email_contents = '<pre style="white-space : pre-wrap">' + email_contents + '</pre>';
+          //     composeView.setBodyHTML(email_contents);   
+          //   } else {
+          //     console.log(res.error);
+          //   }
+          // });
         // }
         // const content = composeView.getHTMLContent();
         // let userText = getUserText(content);

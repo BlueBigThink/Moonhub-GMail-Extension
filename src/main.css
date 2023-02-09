@@ -48,8 +48,8 @@
 
 #word-suggestion-list {
     width: 352px;
-    max-height: 271px;
     min-height: 36px;
+    max-height: 271px;
     height: fit-content;
     border : 1px solid #EDEDED;
     border-radius: 8px;
@@ -67,12 +67,12 @@ ul {
     margin: 0;
 }
 ul > li {
-    background: #FFFFFF;
-    cursor: pointer;
     margin : 4px 0px;
-    border : 1px solid #EDEDED;
     padding: 8px 12px 8px 12px;
+    background: #FFFFFF;
+    border : 1px solid #EDEDED;
     border-radius: 6px;
+    cursor: pointer;
     gap: 10px;
     font-family: 'Silka';
     font-weight: 500;
@@ -113,12 +113,11 @@ input{
     line-height: 20px;
     background: #FFFFFF;
     border: 1px solid #EDEDED;
-    /* background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 18 18'><path fill='%238C92A0' d='M11.44 10.73l4.41 4.42a.5.5 0 1 1-.7.7l-4.42-4.41a6.5 6.5 0 1 1 .7-.7v-.01zM6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11z'></path></svg>"); */
+    border-radius: 100px;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 18 18'><path d='M11.44 10.73l4.41 4.42a.5.5 0 1 1-.7.7l-4.42-4.41a6.5 6.5 0 1 1 .7-.7v-.01zM6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11z'></path></svg>");
     background-repeat: no-repeat;
     background-position: 15px 10px;
     background-size: 20px 20px;
-    border-radius: 100px;
     width: -webkit-fill-available;
     padding: 8px 46px 8px 46px;
 } 
@@ -141,19 +140,19 @@ button {
 }
 
 #moonhub-container {
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
+    top: 0;
+    left: 0;
     z-index: 2147483648;
     position: absolute;
     pointer-events: none;
 }
 
 .monnhub-container-relative {
+    position: relative;
     width: 100%;
     height: 100%;
-    position: relative;
     pointer-events: none;
 }
 
@@ -161,7 +160,6 @@ button {
     background-color: transparent;
     width: 400px;
     height: 296px;
-    
     position: absolute;
     pointer-events: auto;
 }
@@ -174,8 +172,8 @@ button {
 .generator-title {
     width: 400px;
     height: 64px;
-    background: #FFFFFF;
     display: flex;
+    background: #FFFFFF;
     border: 1px solid #EDEDED;
     border-radius: 12px 12px 0 0;
 }
@@ -191,12 +189,12 @@ button {
     width: auto;
     height: 36px;
     margin: 16px 0;
+    display: table;
 }
 
 .title-top {
     width: auto;
     height: 18px;
-
     font-family: 'Silka';
     font-style: normal;
     font-weight: 600;
@@ -208,11 +206,13 @@ button {
 .title-bottom {
     width: auto;
     height: 18px;
+    vertical-align: middle;
+    display: table-cell;
     color: #89888E;
     font-family: 'Silka';
+    font-size: 14px;
     font-style: normal;
     font-weight: 400;
-    font-size: 12px;
     line-height: 16px;   
 }
 
@@ -269,6 +269,13 @@ button {
     background-repeat: no-repeat;
 }
 
+.cross-btn {
+    width: 32px;
+    height: 32px;
+    background-image: url('chrome-extension://__MSG_@@extension_id__/images/Exit32.png');
+    background-repeat: no-repeat;
+}
+
 .round-button-label {
     position: absolute;
     width: 100%;
@@ -305,16 +312,10 @@ button {
     background: #F9FAFB;
     border: 1px solid #EDEDED;
     border-radius: 0 0 12px 12px;
-    padding: 12px 16px 12px 191px;
+    padding: 12px 16px 12px 16px;
 }
 
 .btn-cancel {
-    /* display: flex;
-    flex-direction: row;
-    justify-content: center;
-    padding: 8px 16px;
-    gap: 8px; */
-    
     width: 82px;
     height: 36px;
     margin-right: 12px;
@@ -336,6 +337,23 @@ button {
     background: #5F2EE5;
     border: 1px solid #5F2EE5;
     border-radius: 6px;
+    align-items: center;
+    font-family: 'Silka';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 20px;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+
+.btn-refresh {
+    width: 99px;
+    height: 36px;
+    background: #49AB5E;
+    border: 1px solid #49AB5E;
+    border-radius: 6px;
+    margin-right: 76px;
     align-items: center;
     font-family: 'Silka';
     font-style: normal;
