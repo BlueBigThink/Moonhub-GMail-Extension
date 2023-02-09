@@ -45,34 +45,35 @@
 /********************************************************/
 /******************Suggestion word list******************/
 /********************************************************/
-
 #word-suggestion-list {
     width: 352px;
-    min-height: 36px;
     max-height: 271px;
-    height: fit-content;
+    min-height: 40px;
+    height: auto;
     border : 1px solid #EDEDED;
     border-radius: 8px;
     margin-bottom: 10px;
     padding: 16px 6px 16px 16px;
-    overflow-x: hidden;
-    overflow-y: scroll;
 }
 ul {
     position: static;
+    max-height: 271px;
+    min-height: 40px;
+    height: auto;
     padding: 0 6px 0 0;
     width: calc(100% - 6px);
-    height: 100%;
     list-style: none;
     margin: 0;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 ul > li {
-    margin : 4px 0px;
-    padding: 8px 12px 8px 12px;
     background: #FFFFFF;
-    border : 1px solid #EDEDED;
-    border-radius: 6px;
     cursor: pointer;
+    margin : 4px 0px;
+    border : 1px solid #EDEDED;
+    padding: 8px 12px 8px 12px;
+    border-radius: 6px;
     gap: 10px;
     font-family: 'Silka';
     font-weight: 500;
@@ -276,6 +277,11 @@ button {
     background-repeat: no-repeat;
 }
 
+.cross-btn:hover {
+    border: 1px solid #757575;
+    border-radius: 16px;
+}
+
 .round-button-label {
     position: absolute;
     width: 100%;
@@ -331,7 +337,11 @@ button {
     cursor: pointer;
 }
 
-.btn-generate {
+.btn-cancel:hover {
+    border: 1px solid #858282;
+}
+
+.btn-keep {
     width: 99px;
     height: 36px;
     background: #5F2EE5;
@@ -345,6 +355,11 @@ button {
     line-height: 20px;
     color: #FFFFFF;
     cursor: pointer;
+}
+
+.btn-keep:hover {
+    background: #460ce6;
+    border: 1px solid #460ce6;
 }
 
 .btn-refresh {
@@ -362,4 +377,9 @@ button {
     line-height: 20px;
     color: #FFFFFF;
     cursor: pointer;
+}
+
+.btn-refresh:hover {
+    background: #11af34;
+    border: 1px solid #11af34;
 }

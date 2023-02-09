@@ -55,7 +55,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                     <div class="generator-button moonhub">
                     <button class="btn-refresh moonhub" @click="handleGenerate">Retry</button>
                     <button class="btn-cancel moonhub" @click="handleCancel">Cancel</button>
-                    <button class="btn-generate moonhub" @click="handleReplaceEmail">Keep</button>
+                    <button class="btn-keep moonhub" @click="handleReplaceEmail">Keep</button>
                     </div>
                   </div>
                   <button class="cross-btn only-btn moonhub" @click="handleCancel"></button>
@@ -280,7 +280,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                 email = email + `<div>${content}</div>`;
               }
               composeView.setBodyHTML(email);
-              getSuggestionList(content);
+              this.getSuggestionList(content);
             },
             handleSearchInput(event){
               this.sentences = this.all.filter(item => item.search(this.searchInput) > -1);
