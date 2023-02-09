@@ -110,11 +110,9 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           getAIEmail(){
             const email_content = composeView.getHTMLContent();
             //TODO
-            axios({
-              method: 'POST',
-              url : `https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/get-ai-email/`,
+            axios.post(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/ai-email-prompt/`,{
               headers : {
-                'Content-Type' : 'application/json'
+                'Content-Type' : 'text/plain'
               },
               data : {
                 text : email_content
