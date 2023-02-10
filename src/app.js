@@ -79,7 +79,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         data() {
           return {
             timer : -1,
-            ai_email : "Hi Mary,\nIt’s great to hear from you today!\nThe compensation for the SWE role is 100,000 - 150,000$.\nIf you are interested in moving forward can you find a time on my calendly here: calendly.com/nancy?",
+            ai_email : "",
             bTopicDetected : false,
             sTopicDetected : "1 topic detected",
             bShowGenerate : false,
@@ -110,7 +110,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           getAIEmail(){
             const email_content = composeView.getHTMLContent();
             //TODO
-            axios.post(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/ai-email-prompt/`,{
+            axios.post(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/ai-email-prompt`,{
               headers : {
                 'Content-Type' : 'text/plain'
               },
@@ -122,13 +122,14 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               if (res.status === 200) {
                 //TODO
                 this.ai_email = res.data.ai_email;
-                console.log(ai_email);
+                console.log(this.ai_email);
               } else {
                 console.log(res.error);
               }
             });  
           },
           handleToolButton(event){
+            this.getAIEmail();
             this.bShowGenerate = true;
             g_bShowGenerate = true;
           },
