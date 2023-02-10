@@ -3,6 +3,7 @@ InboxSDK.loadScript('https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.m
 
 var g_bMoonhubApp = false;
 var g_bShowGenerate = false;
+var g_nWatchTimer = -1;
 InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
    // the SDK has been loaded, now do something with it!
    sdk.Compose.registerComposeViewHandler(function(composeView){
@@ -78,7 +79,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         `,
         data() {
           return {
-            timer : -1,
             ai_email : "",
             bTopicDetected : false,
             sTopicDetected : "1 topic detected",
@@ -89,8 +89,9 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         },
         methods: {
           watchEvent(){
-            this.timer = setInterval(() => {
+            g_nWatchTimer = setInterval(() => {
               let email = composeView.getTextContent();
+              console.log("here => ", email);
               if(email !== '') {
                 email = composeView.getHTMLContent().toString();
                 // var temp = "This is a string.";
@@ -109,6 +110,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           },
           getAIEmail(){
             const email_content = composeView.getHTMLContent();
+            console.log(email_content);
             //TODO
             axios.post(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/ai-email-prompt`,{
               headers : {
@@ -121,8 +123,8 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             .then(res => {
               if (res.status === 200) {
                 //TODO
-                this.ai_email = res.data.ai_email;
-                console.log(this.ai_email);
+                this.ai_email = res.data.ai_emails;
+                console.log(this.ai_emails);
               } else {
                 console.log(res.error);
               }
@@ -165,7 +167,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           this.moveToolContainer();
         },
         beforeDestroy(){
-          clearInterval(this.timer);
+          clearInterval(g_nWatchTimer);
         }
       });
       g_bMoonhubApp = true;
@@ -181,6 +183,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
 
     function rmMoonhubApp(){
       try{
+        clearInterval(g_nWatchTimer);
         document.getElementById('moonhub-container').remove();
         g_bMoonhubApp = false;
         g_bShowGenerate = false;
