@@ -26,7 +26,22 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
       });
       //Watch the email status
     }, 500);
-    
+
+    const Modifier = {
+      get getHTML(){
+        return composeView.getHTMLContent();
+      },
+      get getText(){
+        return composeView.getTextContent();
+      },
+      set sHTML(html){
+        composeView.setBodyHTML(html);
+      },
+      set sText(text){
+        composeView.setBodyText(text);
+      }
+    }  
+
     function addMoonhubApp(el) {
       if(g_bMoonhubApp) return;
 
@@ -126,10 +141,9 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         methods: {
           watchEvent(){
             g_nWatchTimer = setInterval(() => {
-              let email = composeView.getTextContent();
-              console.log("here => ", email);
+              let email = Modifier.getText;
               if(email !== '') {
-                email = composeView.getHTMLContent().toString();
+                email = Modifier.getHTML.toString();
                 // var temp = "This is a string.";
                 let count = (email.match(/<div>/g) || []).length + 1;
                 if(count == 1){
@@ -148,8 +162,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             loading = this.bLoading;
             if(loading) return;
             this.bLoading = true;
-            const email_content = composeView.getHTMLContent();
-            console.log(email_content);
+            const email_content = Modifier.getHTML;
             //TODO
             axios.post(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/ai-email-prompt`,{
               headers : {
@@ -163,7 +176,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               if (res.status === 200) {
                 //TODO
                 this.ai_email = res.data.ai_emails;
-                console.log(this.ai_emails);
               } else {
                 console.log(res.error);
               }
@@ -187,7 +199,8 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           handleReplaceEmail(event){
             loading = this.bLoading;
             if(loading) return;
-            composeView.setBodyHTML('<pre style="white-space : pre-wrap">' + this.ai_email + '</pre>');
+            Modifier.sHTML = '<pre style="white-space : pre-wrap">' + this.ai_email + '</pre>'
+            // composeView.setBodyHTML('<pre style="white-space : pre-wrap">' + this.ai_email + '</pre>');
             this.handleCancel(event);
           },
           moveToolContainer() {
@@ -326,7 +339,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                 if (res.status === 200) {
                   //TODO
                   suggesion_list = res.data.list;
-                  console.log(suggesion_list);
                   suggesion_list.forEach(item => {
                     this.sentences.push(item);
                   });
@@ -338,14 +350,15 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             handleItem(event){
               const content = event.target.title;
               //TODO
-              let email = composeView.getHTMLContent();
-              let s_email = composeView.getTextContent();
+              let email = Modifier.getHTML;
+              let s_email = Modifier.getText;
               if(s_email == ''){
                 email = content;
               }else{
                 email = email + `<div>${content}</div>`;
               }
-              composeView.setBodyHTML(email);
+              Modifier.sHTML = email;
+              // composeView.setBodyHTML(email);
               this.getSuggestionList(content);
             },
             handleSearchInput(event){
