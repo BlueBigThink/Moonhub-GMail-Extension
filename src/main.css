@@ -138,6 +138,7 @@ input{
 /********************************************************/
 button {
     background-color: transparent;
+    border: none;
 }
 
 #moonhub-container {

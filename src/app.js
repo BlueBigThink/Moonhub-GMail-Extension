@@ -162,7 +162,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             loading = this.bLoading;
             if(loading) return;
             this.bLoading = true;
-            const email_content = Modifier.getHTML;
+            const email_content = Modifier.getText;
             //TODO
             axios.post(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/ai-email-prompt`,{
               headers : {
@@ -176,8 +176,9 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               if (res.status === 200) {
                 //TODO
                 this.ai_email = res.data.ai_emails;
+                console.log(res.data);
               } else {
-                console.log(res.error);
+                console.log("error", res.error);
               }
               this.bLoading = false;
             });  
