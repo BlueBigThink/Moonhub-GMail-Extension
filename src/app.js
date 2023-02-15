@@ -34,6 +34,9 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
       get getText(){
         return composeView.getTextContent();
       },
+      get getThreadID(){
+        return composeView.getThreadID();
+      },
       set sHTML(html){
         composeView.setBodyHTML(html);
       },
@@ -174,7 +177,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             })
             .then(res => {
               if (res.status === 200) {
-                //TODO
                 this.ai_email = res.data.ai_emails;
                 console.log(res.data);
               } else {
@@ -256,54 +258,46 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
       chrome : false,
       hasDropdown: true,
       onClick: async function(event) {
-        //TODO
-        // let threadID = composeView.getThreadID();
-        // if(threadID == ''){
-        //   console.log('This is new email. Not reply!');
-        // }else{
-        //   axios.get(`https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/ai-email/${threadID}`, {
-        //       headers : {
-        //       'Content-Type' : 'application/json'
-        //     }
-        //    })
-        //   .then(res => {
-        //     if (res.status === 200) {
-        //       email_contents = res.data.ai_emails;
-        //       console.log(email_contents);
-        //       email_contents = '<pre style="white-space : pre-wrap">' + email_contents + '</pre>';
-        //       composeView.setBodyHTML(email_contents);   
-        //     } else {
-        //       console.log(res.error);
-        //     }
-        //   });
-        // }
         event.dropdown.el.innerHTML = '<div id="drop-down-menu"></div>';
         const suggestion_word_list = new Vue({
           el: '#drop-down-menu',
           template: `
             <div id="word-suggestion-list">
-              <ul>
-                <div class="li-search">
-                  <input  id="#input-search" 
-                          class="input-grey-rounded" 
-                          type="text" 
-                          placeholder="Search for anything here..."
-                          v-model="searchInput"
-                          v-on:input="handleSearchInput"
-                  />
+              <template v-if="bfetching">
+                <div class="loading-container">
+                  <div class="loading">
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                    <div class="loading-dot"></div>
+                  </div>             
                 </div>
-                <template v-for="sentence in sentences">
-                  <li :title="sentence" @click="handleItem">
-                    {{sentence}}
-                  </li>
-                </template>
-              </ul>
+              </template>
+              <template v-else>
+                <ul>
+                  <div class="li-search">
+                    <input  id="#input-search" 
+                            class="input-grey-rounded" 
+                            type="text" 
+                            placeholder="Search for anything here..."
+                            v-model="searchInput"
+                            v-on:input="handleSearchInput"
+                    />
+                  </div>
+                  <template v-for="completion in completions">
+                    <li :title="completion" @click="handleItem">
+                      {{completion}}
+                    </li>
+                  </template>
+                </ul>
+              </template>
             </div>
           `,
           data(){
             return {
+              bfetching : false,
               searchInput : '',
-              sentences : [
+              completions : [
               ],
               all : [
               ]
@@ -313,42 +307,47 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             var inboxDropdown = document.getElementById("word-suggestion-list").parentElement;
             inboxDropdown.style.border = '0px solid black';
             inboxDropdown.style["boxShadow"] = 'none';
-            //TODO
-            this.all.push("say it's great to hear from them");
-            this.all.push("send calendly link");
-            this.all.push("provide compensation details");
-            this.all.push("Libero massa dolor. Nibh sed nec, non neque");
-            this.all.push("You busy? have some time?");
-            this.all.push("Nice to meet you!");
-            this.all.push("say to him");
-            this.all.forEach(item => this.sentences.push(item));//TODO
+            const threadID = Modifier.getThreadID;
+            if(threadID == ''){
+              console.log('This is new email. Not reply!');
+              return;
+            }
+            this.getSuggestionList(threadID);
           },
           methods:{
-            getSuggestionList(completion){
+            getSuggestionList(threadID){
+              this.bfetching = true;
+              const email_content = Modifier.getText;
               //TODO
               axios({
-                method: 'POST',
-                url : `https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/get-suggestion/`,
+                method: 'GET',
+                url : `https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/get-suggestions/?thread_id=${threadID}&compose_view=${email_content}`,
                 headers : {
                   'Content-Type' : 'application/json'
-                },
-                data : {
-                  text : completion
                 }
               })
               .then(res => {
                 if (res.status === 200) {
-                  //TODO
-                  suggesion_list = res.data.list;
+                  suggesion_list = res.data;
+                  console.log(suggesion_list);
                   suggesion_list.forEach(item => {
-                    this.sentences.push(item);
+                    if(item != '')
+                      this.completions.push(item);
                   });
+                  this.bfetching = false;
                 } else {
                   console.log(res.error);
+                  this.bfetching = false;
                 }
-              });  
+              });
             },  
             handleItem(event){
+              this.completions = [];
+              const threadID = Modifier.getThreadID;
+              if(threadID == ''){
+                console.log('This is new email. Not reply!');
+                return;
+              }    
               const content = event.target.title;
               //TODO
               let email = Modifier.getHTML;
@@ -359,11 +358,10 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                 email = email + `<div>${content}</div>`;
               }
               Modifier.sHTML = email;
-              // composeView.setBodyHTML(email);
-              this.getSuggestionList(content);
+              this.getSuggestionList(threadID);
             },
             handleSearchInput(event){
-              this.sentences = this.all.filter(item => item.search(this.searchInput) > -1);
+              this.completions = this.all.filter(item => item.search(this.searchInput) > -1);
             },
           }
         });
@@ -404,9 +402,9 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                   if (res.status === 200) {
                     bSigned = res.data.signin;
                     if(bSigned){
-                      localStorage.setItem("login", "true");//TODO
+                      localStorage.setItem("login", "true");
                     }else{
-                      localStorage.setItem("login", "false");//TODO
+                      localStorage.setItem("login", "false");
                     }
                   }
                 });
