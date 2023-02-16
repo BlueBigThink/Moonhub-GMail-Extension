@@ -137,7 +137,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                 <template v-else>
                   <button class="tool-button moonhub" @click="handleToolButton">
                     <div class="round-button-label moonhub">
-                      <div class="round-button-label-content moonhub">{{sTopicDetected}}</div>
+                      <div class="round-button-label-content moonhub">Generate</div>
                     </div>
                     <div class="round-btn moonhub"></div>
                   </button>
@@ -170,12 +170,12 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               if(email !== '' && email.length !== 1) {
                 email = Modifier.getHTML.toString();
                 // var temp = "This is a string.";
-                let count = (email.match(/<div>/g) || []).length;
-                if(count == 1){
-                  this.sTopicDetected = "1 topic detected";
-                } else if(count > 1) {
-                  this.sTopicDetected = count + " topics detected";
-                }
+                // let count = (email.match(/<div>/g) || []).length;
+                // if(count == 1){
+                //   this.sTopicDetected = "1 topic detected";
+                // } else if(count > 1) {
+                //   this.sTopicDetected = count + " topics detected";
+                // }
                 this.bTopicDetected = true;
                 // this.moveToolContainer();
               } else { 
