@@ -4,6 +4,7 @@ InboxSDK.loadScript('https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.m
 var g_bMoonhubApp = false;
 var g_bShowGenerate = false;
 var g_nWatchTimer = -1;
+var g_Edit = null;
 InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
    // the SDK has been loaded, now do something with it!
    sdk.Compose.registerComposeViewHandler(function(composeView){
@@ -14,7 +15,8 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
       const el_Arr = document.querySelectorAll('[g_editable="true"]');
       el_Arr.forEach((element, index) => {
         if(el === element) {
-          console.log("Detected!", index);
+          // console.log("Detected!", index);
+          g_Edit = el;
           addMoonhubApp(el);
         } else {
           if(el.classList.contains("moonhub") || g_bShowGenerate == true){
@@ -27,21 +29,39 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
       //Watch the email status
     }, 500);
 
+    function isNum(c){
+      let bRes = false;
+      if(c >= '0' && c <= '9')
+        bRes = true;
+      return bRes;
+    }
+
+    function isLetter(c){
+      let bRes = false;
+      if(c >='A' && c <='z')
+        bRes = true;
+      return bRes;
+    }
+
     const Modifier = {
       get getHTML(){
-        return composeView.getHTMLContent();
+        return g_Edit.innerHTML;
+        // return composeView.getHTMLContent();
       },
       get getText(){
-        return composeView.getTextContent();
+        return g_Edit.innerText;
+        // return composeView.getTextContent();
       },
       get getThreadID(){
         return composeView.getThreadID();
       },
       set sHTML(html){
-        composeView.setBodyHTML(html);
+        g_Edit.innerHTML = html;
+        // composeView.setBodyHTML(html);
       },
       set sText(text){
-        composeView.setBodyText(text);
+        g_Edit.innerText = text;
+        // composeView.setBodyText(text);
       }
     }  
 
@@ -145,10 +165,12 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           watchEvent(){
             g_nWatchTimer = setInterval(() => {
               let email = Modifier.getText;
-              if(email !== '') {
+              let emailHtml = Modifier.getHTML;
+              // console.log("Debug => ", Modifier.getHTML.toString(), email.length);
+              if(email !== '' && email.length !== 1) {
                 email = Modifier.getHTML.toString();
                 // var temp = "This is a string.";
-                let count = (email.match(/<div>/g) || []).length + 1;
+                let count = (email.match(/<div>/g) || []).length;
                 if(count == 1){
                   this.sTopicDetected = "1 topic detected";
                 } else if(count > 1) {
@@ -212,7 +234,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             const bottom = window.innerHeight - parseInt(style.height.toString()) - offset.top;
             let moonhub = document.getElementById('moonhub-tool-container');
             mRight = (right + 20) + 'px';
-            mBottom = (bottom + 20) + 'px';
+            mBottom = (bottom + 10) + 'px';
             moonhub.style.right = mRight;
             moonhub.style.bottom = mBottom;
           }
@@ -247,7 +269,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         g_bMoonhubApp = false;
         g_bShowGenerate = false;
       }catch(err){
-        console.log('No exist moonhub app!');
+        // console.log('No exist moonhub app!');
       }
     }
 
@@ -275,15 +297,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               </template>
               <template v-else>
                 <ul>
-                  <div class="li-search">
-                    <input  id="#input-search" 
-                            class="input-grey-rounded" 
-                            type="text" 
-                            placeholder="Search for anything here..."
-                            v-model="searchInput"
-                            v-on:input="handleSearchInput"
-                    />
-                  </div>
                   <template v-for="completion in completions">
                     <li :title="completion" @click="handleItem">
                       {{completion}}
@@ -329,7 +342,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               .then(res => {
                 if (res.status === 200) {
                   suggesion_list = res.data;
-                  console.log(suggesion_list);
+                  // console.log(suggesion_list);
                   suggesion_list.forEach(item => {
                     if(item != '')
                       this.completions.push(item);
@@ -351,9 +364,10 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               const content = event.target.title;
               //TODO
               let email = Modifier.getHTML;
-              let s_email = Modifier.getText;
+              let s_email = Modifier.getText.toString();
+              if(s_email == ' <br>') email = '';
               if(s_email == ''){
-                email = content;
+                email = `<div>${content}</div>`;
               }else{
                 email = email + `<div>${content}</div>`;
               }
