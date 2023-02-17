@@ -15,12 +15,7 @@
     "tabs"
   ],
   "host_permissions": [
-<<<<<<< HEAD
-    "<all_urls>",
-    "https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/"
-=======
     "https://mail.google.com/"
->>>>>>> develop-2nd-release
   ],
   "content_scripts" : [
     {
