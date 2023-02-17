@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Moonhub Inbox Extension",
-  "version": "1.0",
-  "description": "Moonhub Inbox Extension",
+  "version": "2.0",
+  "description": "Moonhub provides the powerful AI email generation functions.",
   "permissions": [
     "https://google.com/",
     "https://mail.google.com/",
@@ -15,8 +15,12 @@
     "tabs"
   ],
   "host_permissions": [
+<<<<<<< HEAD
     "<all_urls>",
     "https://email-generation-backend-dev-ggwnhuypbq-uc.a.run.app/"
+=======
+    "https://mail.google.com/"
+>>>>>>> develop-2nd-release
   ],
   "content_scripts" : [
     {
