@@ -92,6 +92,12 @@ ul > li:hover {
     margin: 8px 130px 8px 136px;
 }
 
+.retry-container{
+    vertical-align: middle;
+    display: table-cell;
+    background: transparent;
+}
+
 .loading {
     padding: 8px;
     background: #EDEDED;
@@ -472,6 +478,28 @@ button {
 .btn-refresh:hover {
     background: #11af34;
     border: 1px solid #11af34;
+}
+
+.btn-retry {
+    width: 99px;
+    height: 36px;
+    background: #2a99e4;
+    border: 1px solid #2a99e4;
+    border-radius: 6px;
+    margin-right: 76px;
+    align-items: center;
+    font-family: 'Silka';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 20px;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+
+.btn-retry:hover {
+    background: #115baf;
+    border: 1px solid #115baf;
 }
 
 /********************************************************/

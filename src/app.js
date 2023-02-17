@@ -285,13 +285,20 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           el: '#drop-down-menu',
           template: `
             <div id="word-suggestion-list">
-              <template v-if="bfetching">
+              <template v-if="nfetching == 1">
                 <div class="loading-container">
                   <div class="loading">
                     <div class="loading-dot"></div>
                     <div class="loading-dot"></div>
                     <div class="loading-dot"></div>
                     <div class="loading-dot"></div>
+                  </div>             
+                </div>
+              </template>
+              <template v-else-if="nfetching == 2">
+                <div class="loading-container">
+                  <div class="retry-container">
+                    <button class="btn-retry" @click="handleRetry">Retry</button>
                   </div>             
                 </div>
               </template>
@@ -308,6 +315,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           `,
           data(){
             return {
+              nfetching : 0,
               bfetching : false,
               searchInput : '',
               completions : [
@@ -315,6 +323,8 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
               all : [
               ]
             }
+          },
+          created() {
           },
           mounted() {
             var inboxDropdown = document.getElementById("word-suggestion-list").parentElement;
@@ -329,7 +339,8 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           },
           methods:{
             getSuggestionList(threadID){
-              this.bfetching = true;
+              // this.bfetching = true;
+              this.nfetching = 1;
               const email_content = Modifier.getText;
               //TODO
               axios({
@@ -347,12 +358,20 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                     if(item != '')
                       this.completions.push(item);
                   });
-                  this.bfetching = false;
+                  // this.bfetching = false;
+                  this.nfetching = 0;
                 } else {
-                  console.log(res.error);
-                  this.bfetching = false;
+                  console.log("Error =>", res.error);
+                  // this.bfetching = false;
+                  this.nfetching = 0;
                 }
-              });
+              })
+              .catch(error => {
+                console.log("Request Error =>", error);
+                // this.bfetching = false;
+                // this.getSuggestionList(threadID);
+                this.nfetching = 2;
+              })
             },  
             handleItem(event){
               this.completions = [];
@@ -377,6 +396,15 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             handleSearchInput(event){
               this.completions = this.all.filter(item => item.search(this.searchInput) > -1);
             },
+            handleRetry(event){
+              this.completions = [];
+              const threadID = Modifier.getThreadID;
+              if(threadID == ''){
+                console.log('This is new email. Not reply!');
+                return;
+              }
+              this.getSuggestionList(threadID);
+            }
           }
         });
         // }
