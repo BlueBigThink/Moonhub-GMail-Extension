@@ -277,6 +277,8 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
     composeView.addButton({
       title: "Moonhub",
       iconUrl: chrome.extension.getURL('images/icon.png'),
+      chrome : false,
+      hasDropdown: true,
       onClick: async function(event) {
         event.dropdown.el.innerHTML = '<div id="drop-down-menu"></div>';
         const suggestion_word_list = new Vue({
