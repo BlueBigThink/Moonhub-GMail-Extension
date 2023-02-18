@@ -29,20 +29,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
       //Watch the email status
     }, 500);
 
-    function isNum(c){
-      let bRes = false;
-      if(c >= '0' && c <= '9')
-        bRes = true;
-      return bRes;
-    }
-
-    function isLetter(c){
-      let bRes = false;
-      if(c >='A' && c <='z')
-        bRes = true;
-      return bRes;
-    }
-
     const Modifier = {
       get getHTML(){
         return g_Edit.innerHTML;
@@ -68,7 +54,7 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
     function addMoonhubApp(el) {
       if(g_bMoonhubApp) return;
 
-      const style = window.getComputedStyle(el);
+      // const style = window.getComputedStyle(el);
       var div=document.createElement("div"); 
       div.setAttribute("id", "moonhub-container-elm");
       document.body.appendChild(div); 
@@ -165,22 +151,13 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           watchEvent(){
             g_nWatchTimer = setInterval(() => {
               let email = Modifier.getText;
-              let emailHtml = Modifier.getHTML;
-              // console.log("Debug => ", Modifier.getHTML.toString(), email.length);
               if(email !== '' && email.length !== 1) {
                 email = Modifier.getHTML.toString();
-                // var temp = "This is a string.";
-                // let count = (email.match(/<div>/g) || []).length;
-                // if(count == 1){
-                //   this.sTopicDetected = "1 topic detected";
-                // } else if(count > 1) {
-                //   this.sTopicDetected = count + " topics detected";
-                // }
                 this.bTopicDetected = true;
-                // this.moveToolContainer();
               } else { 
                 this.bTopicDetected = false;
               }
+              this.moveToolContainer();
             }, 500);
           },
           getAIEmail(){
@@ -225,18 +202,22 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
             loading = this.bLoading;
             if(loading) return;
             Modifier.sHTML = '<pre style="white-space : pre-wrap">' + this.ai_email + '</pre>'
-            // composeView.setBodyHTML('<pre style="white-space : pre-wrap">' + this.ai_email + '</pre>');
             this.handleCancel(event);
           },
           moveToolContainer() {
-            const offset = getOffset(el);
-            const right = window.innerWidth - parseInt(style.width.toString()) - offset.left;
-            const bottom = window.innerHeight - parseInt(style.height.toString()) - offset.top;
-            let moonhub = document.getElementById('moonhub-tool-container');
-            mRight = (right + 20) + 'px';
-            mBottom = (bottom + 10) + 'px';
-            moonhub.style.right = mRight;
-            moonhub.style.bottom = mBottom;
+            try{
+              let trash = trackTrash();
+              const offset = getOffset(trash);
+              const right = window.innerWidth - offset.left;
+              const bottom = window.innerHeight - offset.top;
+              let moonhub = document.getElementById('moonhub-tool-container');
+              mRight = (right - 10 ) + 'px';
+              mBottom = (bottom + 25) + 'px';
+              moonhub.style.right = mRight;
+              moonhub.style.bottom = mBottom;
+            } catch(e) {
+              console.log(e);
+            }
           }
         },
         created() {
@@ -244,7 +225,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           this.watchEvent();
         },
         mounted(){
-          // if(!this.bTopicDetected) return;
           this.moveToolContainer();
         },
         beforeDestroy(){
@@ -260,6 +240,11 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
         left: rect.left + window.scrollX,
         top: rect.top + window.scrollY
       };
+    }
+
+    function trackTrash(){
+      const trashEle = document.getElementsByClassName('bty');
+      return trashEle[0];
     }
 
     function rmMoonhubApp(){
@@ -316,7 +301,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           data(){
             return {
               nfetching : 0,
-              bfetching : false,
               searchInput : '',
               completions : [
               ],
@@ -339,7 +323,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
           },
           methods:{
             getSuggestionList(threadID){
-              // this.bfetching = true;
               this.nfetching = 1;
               const email_content = Modifier.getText;
               //TODO
@@ -358,17 +341,14 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
                     if(item != '')
                       this.completions.push(item);
                   });
-                  // this.bfetching = false;
                   this.nfetching = 0;
                 } else {
                   console.log("Error =>", res.error);
-                  // this.bfetching = false;
                   this.nfetching = 0;
                 }
               })
               .catch(error => {
                 console.log("Request Error =>", error);
-                // this.bfetching = false;
                 // this.getSuggestionList(threadID);
                 this.nfetching = 2;
               })
@@ -481,12 +461,6 @@ InboxSDK.load(2, 'sdk_moonhub-inbox_d80d2bf259').then(function(sdk){
     composeView.on('sent', (event) => {
       const threadID = composeView.getThreadID();
       console.log("Sent ========>", threadID);
-      // axios.get(`http://127.0.0.1:5000/api/send?threadid=${threadID}`)
-      // .then(res => {
-      //   if (res.status === 200) {
-      //     console.log("Sent threadID");
-      //   }
-      // });
     });
   });
 });
